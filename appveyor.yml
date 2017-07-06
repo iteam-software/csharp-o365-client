@@ -1,0 +1,22 @@
+version: 0.0.{build}
+skip_non_tags: true
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+before_build:
+- cmd: nuget restore
+build:
+  verbosity: minimal
+after_build:
+- cmd: >-
+    dotnet pack iTEAMConsulting.O365.Abstractions\iTEAMConsulting.O365.Abstractions.csproj /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
+
+    dotnet pack iTEAMConsulting.O365\iTEAMConsulting.O365.csproj /p:PackageVersion=%APPVEYOR_BUILD_VERSION%
+artifacts:
+- path: '**\*.nupkg'
+  name: NuGet
+deploy:
+- provider: NuGet
+  api_key:
+    secure: 1ari/m47eHoJGgmOFDsCXYZRSQSjb1JFNrZz1T45QeQcwYQAqHOpN9IkcCXwoh3W
+  artifact: NuGet
