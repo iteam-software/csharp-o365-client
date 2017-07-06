@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <Authors>software@iteamnm.com</Authors>
+    <Company>iTEAM Consulting</Company>
+    <Description>Provides implementation details for the iTEAM Consulting Office365 restful client tools.</Description>
+    <PackageLicenseUrl>https://github.com/iteam-consulting/csharp-o365-client/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/iteam-consulting/csharp-o365-client</PackageProjectUrl>
+    <PackageIconUrl>https://s.gravatar.com/avatar/468367f85c4e89a0bbd1ac1d0f43adb1?s=80</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/iteam-consulting/csharp-form-handler.git</RepositoryUrl>
+    <Version>0.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="1.1.2" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="3.14.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\iTEAMConsulting.O365.Abstractions\iTEAMConsulting.O365.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
