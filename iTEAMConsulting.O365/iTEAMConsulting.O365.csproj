@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\iTEAMConsulting.O365.Abstractions\iTEAMConsulting.O365.Abstractions.csproj" />
+    <ProjectReference Include="..\iTEAMConsulting.O365.Abstractions\iTEAMConsulting.O365.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

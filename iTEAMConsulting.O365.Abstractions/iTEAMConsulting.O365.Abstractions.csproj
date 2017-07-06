@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <Version>0.0.1</Version>
+    <Description>Provides abstractions used to access the O365 rest API</Description>
+    <Copyright>Copyright 2017 iTEAM Consulting</Copyright>
+    <PackageLicenseUrl>https://github.com/iteam-consulting/csharp-o365-client/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/iteam-consulting/csharp-o365-client</PackageProjectUrl>
+    <PackageIconUrl>https://s.gravatar.com/avatar/468367f85c4e89a0bbd1ac1d0f43adb1?s=80</PackageIconUrl>
+    <RepositoryUrl>https://github.com/iteam-consulting/csharp-o365-client.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>
