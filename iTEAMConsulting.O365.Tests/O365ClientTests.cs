@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using System.Threading.Tasks;
 
 namespace iTEAMConsulting.O365.Tests
 {
@@ -109,6 +111,31 @@ namespace iTEAMConsulting.O365.Tests
                 {
                     await client.Login("resource", "clientId", "");
                 });
+        }
+
+        [Fact]
+        public async void LoginShould_ReturnLoginResponse()
+        {
+            // Arrange
+            var authenticationResult = new Mock<AuthenticationResult>();
+            authenticationResult.Setup(result => result.AccessToken)
+                .Returns("Access Token");
+            var authenticationContext = new Mock<AuthenticationContext>();
+            authenticationContext.Setup(context => context.AcquireTokenAsync(It.IsAny<string>(), It.IsAny<ClientCredential>()))
+                .Returns(Task.FromResult(authenticationResult.Object));
+            var mockAdalFactory = new Mock<AdalFactory>();
+            mockAdalFactory.Setup(factory => factory.CreateAuthenticationContext(It.IsAny<string>()))
+                .Returns(authenticationContext.Object);
+            var client = new O365Client(
+                MockOptions(),
+                mockAdalFactory.Object,
+                new BackchannelFactory(),
+                MockLoggerFactory());
+
+            // Act and Assert
+            var response = await client.Login("resource", "clientId", "clientSecret");
+            Assert.NotNull(response);
+            Assert.IsType<LoginResponse>(response);
         }
     }
 }
