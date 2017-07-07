@@ -1,16 +1,10 @@
-﻿using System.Net.Http;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace iTEAMConsulting.O365.Abstractions
 {
     public interface IO365Client
     {
-        /// <summary>
-        /// Backchannel used to access the Office365 endpoints.
-        /// </summary>
-        HttpClient Backchannel { get; }
-
         /// <summary>
         /// Convenience method to login for the office 365 mail resource.
         /// </summary>

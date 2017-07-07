@@ -11,24 +11,38 @@ namespace iTEAMConsulting.O365.Tests
         private IOptions<O365AuthenticationOptions> MockOptions()
         {
             var options = new Mock<IOptions<O365AuthenticationOptions>>();
-            options.Setup(i => i.Value).Returns(
-                new O365AuthenticationOptions()
-                {
-                    ClientId = "LKAMFLDSNFLASDFLANDF",
-                    ClientSecret = "AKLSJFLASNDFLASNDF",
-                    TenantId = "ATAETAERADFADFGER",
-                    TenantName = "FASLALKDFNLANDF"
-                }
-            );
+            options.Setup(i => i.Value)
+                .Returns(
+                    new O365AuthenticationOptions()
+                    {
+                        ClientId = "LKAMFLDSNFLASDFLANDF",
+                        ClientSecret = "AKLSJFLASNDFLASNDF",
+                        TenantId = "ATAETAERADFADFGER",
+                        TenantName = "FASLALKDFNLANDF"
+                    }
+                );
             return options.Object;
         }
 
         private ILoggerFactory MockLoggerFactory(ILogger<O365Client> logger = null)
         {
-            var mockLogger = new Mock<ILoggerFactory>();
-            mockLogger.Setup(factory => factory.CreateLogger<O365Client>())
+            var loggerFactory = new Mock<ILoggerFactory>();
+            loggerFactory.Setup(factory => factory.CreateLogger(It.IsAny<string>()))
                 .Returns(logger);
-            return mockLogger.Object;
+            return loggerFactory.Object;
+        }
+
+        [Fact]
+        public void ItShouldInstantiate_O365Client()
+        {
+            var options = MockOptions();
+            var loggerFactory = MockLoggerFactory();
+
+            Assert.NotNull(new O365Client(
+                options,
+                new AdalFactory(),
+                new BackchannelFactory(),
+                loggerFactory));
         }
     }
 }

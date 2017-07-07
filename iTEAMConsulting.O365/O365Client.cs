@@ -15,10 +15,10 @@ namespace iTEAMConsulting.O365
 {
     public class O365Client : IO365Client
     {
-        private readonly ILogger<O365Client> _logger;
+        private readonly ILogger _logger;
         private readonly IAdalFactory _adalFactory;
         private readonly O365AuthenticationOptions _options;
-        private readonly HttpClient _backchannel = new HttpClient();
+        private readonly HttpClient _backchannel;
         private string _accessToken;
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace iTEAMConsulting.O365
             ILoggerFactory loggerFactory)
         {
             _options = optionsAccessor.Value ?? new O365AuthenticationOptions();
-            _logger = loggerFactory.CreateLogger<O365Client>();
+            _logger = loggerFactory.CreateLogger(nameof(O365Client));
             _adalFactory = adalFactory;
             _backchannel = backchannelFactory.CreateBackchannel("https://outlook.office.com/api/v2/me");
         }

@@ -12,8 +12,4 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-
 </Project>
