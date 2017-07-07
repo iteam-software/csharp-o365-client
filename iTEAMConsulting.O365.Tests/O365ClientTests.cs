@@ -35,14 +35,80 @@ namespace iTEAMConsulting.O365.Tests
         [Fact]
         public void ItShouldInstantiate_O365Client()
         {
-            var options = MockOptions();
-            var loggerFactory = MockLoggerFactory();
-
             Assert.NotNull(new O365Client(
-                options,
+                MockOptions(),
                 new AdalFactory(),
                 new BackchannelFactory(),
-                loggerFactory));
+                MockLoggerFactory()));
+        }
+
+        [Fact]
+        public void LoginShouldThrowOn_NullResource()
+        {
+            // Arrange
+            var client = new O365Client(
+                MockOptions(),
+                new AdalFactory(),
+                new BackchannelFactory(),
+                MockLoggerFactory());
+
+            // Act and Assert
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () =>
+                {
+                    await client.Login(null, "clientId", "clientSecret");
+                });
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () =>
+                {
+                    await client.Login("", "clientId", "clientSecret");
+                });
+        }
+
+        [Fact]
+        public void LoginShouldThrowOn_NullClientId()
+        {
+            // Arrange
+            var client = new O365Client(
+                MockOptions(),
+                new AdalFactory(),
+                new BackchannelFactory(),
+                MockLoggerFactory());
+
+            // Act and Assert
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () =>
+                {
+                    await client.Login("resource", null, "clientSecret");
+                });
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () =>
+                {
+                    await client.Login("resource", "", "clientSecret");
+                });
+        }
+
+        [Fact]
+        public void LoginShouldThrowOn_NullClientSecret()
+        {
+            // Arrange
+            var client = new O365Client(
+                MockOptions(),
+                new AdalFactory(),
+                new BackchannelFactory(),
+                MockLoggerFactory());
+
+            // Act and Assert
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () =>
+                {
+                    await client.Login("resource", "clientId", null);
+                });
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () =>
+                {
+                    await client.Login("resource", "clientId", "");
+                });
         }
     }
 }
