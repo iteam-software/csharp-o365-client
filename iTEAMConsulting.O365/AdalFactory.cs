@@ -4,9 +4,10 @@ namespace iTEAMConsulting.O365
 {
     public class AdalFactory : IAdalFactory
     {
-        public AuthenticationContext CreateAuthenticationContext(string authority)
+        public IAuthenticationContextAdapter CreateAuthenticationContext(string authority)
         {
-            return new AuthenticationContext(authority, false);
+            var context = new AuthenticationContext(authority, false);
+            return new AuthenticationContextAdapter(context);
         }
     }
 }

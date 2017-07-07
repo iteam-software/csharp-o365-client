@@ -117,13 +117,13 @@ namespace iTEAMConsulting.O365.Tests
         public async void LoginShould_ReturnLoginResponse()
         {
             // Arrange
-            var authenticationResult = new Mock<AuthenticationResult>();
+            var authenticationResult = new Mock<IAuthenticationResultAdapter>();
             authenticationResult.Setup(result => result.AccessToken)
                 .Returns("Access Token");
-            var authenticationContext = new Mock<AuthenticationContext>();
+            var authenticationContext = new Mock<IAuthenticationContextAdapter>();
             authenticationContext.Setup(context => context.AcquireTokenAsync(It.IsAny<string>(), It.IsAny<ClientCredential>()))
                 .Returns(Task.FromResult(authenticationResult.Object));
-            var mockAdalFactory = new Mock<AdalFactory>();
+            var mockAdalFactory = new Mock<IAdalFactory>();
             mockAdalFactory.Setup(factory => factory.CreateAuthenticationContext(It.IsAny<string>()))
                 .Returns(authenticationContext.Object);
             var client = new O365Client(
@@ -136,6 +136,7 @@ namespace iTEAMConsulting.O365.Tests
             var response = await client.Login("resource", "clientId", "clientSecret");
             Assert.NotNull(response);
             Assert.IsType<LoginResponse>(response);
+            Assert.Equal("Access Token", response.AccessToken);
         }
     }
 }
