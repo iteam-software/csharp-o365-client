@@ -132,11 +132,53 @@ namespace iTEAMConsulting.O365.Tests
                 new BackchannelFactory(),
                 MockLoggerFactory());
 
-            // Act and Assert
+            // Act
             var response = await client.Login("resource", "clientId", "clientSecret");
+            
+            // Assert
             Assert.NotNull(response);
             Assert.IsType<LoginResponse>(response);
             Assert.Equal("Access Token", response.AccessToken);
+        }
+
+        [Fact]
+        public async void LoginShould_LogOnError()
+        {
+            // Arrange
+            var authenticationContext = new Mock<IAuthenticationContextAdapter>();
+            authenticationContext.Setup(context => context.AcquireTokenAsync(It.IsAny<string>(), It.IsAny<ClientCredential>()))
+                .ThrowsAsync(new Exception());
+            var adalFactory = new Mock<IAdalFactory>();
+            adalFactory.Setup(factory => factory.CreateAuthenticationContext(It.IsAny<string>()))
+                .Returns(authenticationContext.Object);
+            var logger = new Mock<ILogger<O365Client>>();
+            logger.Setup(i => i.Log(
+                Microsoft.Extensions.Logging.LogLevel.Error,
+                0,
+                It.IsAny<Microsoft.Extensions.Logging.Internal.FormattedLogValues>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<object, Exception, string>>()))
+                .Verifiable();
+            var client = new O365Client(
+                MockOptions(),
+                adalFactory.Object,
+                new BackchannelFactory(),
+                MockLoggerFactory(logger.Object));
+
+            // Act
+            var response = await client.Login("resource", "clientId", "clientSecret");
+
+            // Assert
+            logger.Verify(x => x.Log(
+                Microsoft.Extensions.Logging.LogLevel.Error,
+                0,
+                It.IsAny<Microsoft.Extensions.Logging.Internal.FormattedLogValues>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<object, Exception, string>>()),
+                Times.Once(),
+                "Log not called once.");
+            Assert.IsType<LoginResponse>(response);
+            Assert.Empty(response.AccessToken);
         }
     }
 }
