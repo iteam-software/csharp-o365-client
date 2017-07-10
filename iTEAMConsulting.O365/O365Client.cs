@@ -125,7 +125,10 @@ namespace iTEAMConsulting.O365
                 throw new ArgumentNullException(nameof(message.Subject));
             }
 
-            if (!message.ToRecipients.Any(r => string.IsNullOrEmpty(r.EmailAddress)))
+            if (
+                message.ToRecipients.Count() == 0 ||
+                message.ToRecipients.Any(r => string.IsNullOrEmpty(r.EmailAddress))
+            )
             {
                 throw new ArgumentException("You must provide valid recipient email addresses", nameof(message.ToRecipients));
             }
