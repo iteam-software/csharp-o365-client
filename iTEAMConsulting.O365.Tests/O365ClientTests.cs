@@ -9,7 +9,6 @@ using iTEAMConsulting.O365.Abstractions;
 using System.Threading;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Collections;
 
 namespace iTEAMConsulting.O365.Tests
 {
@@ -152,6 +151,33 @@ namespace iTEAMConsulting.O365.Tests
             Assert.NotNull(response);
             Assert.IsType<LoginResponse>(response);
             Assert.Equal("Access Token", response.AccessToken);
+            Assert.Equal(200, response.StatusCode);
+            Assert.Equal(true, response.Success);
+        }
+
+        [Fact]
+        public async void InitializeForAppMailShould_Login()
+        {
+            // Arrange
+            var client = CreateClient();
+            var recipient = new Mock<IRecipient>();
+            recipient.Setup(r => r.EmailAddress)
+                .Returns("abc@abc.com");
+            var message = new Mock<IMessage>();
+            message.Setup(m => m.Body)
+                .Returns("Body");
+            message.Setup(m => m.Subject)
+                .Returns("Subject");
+            message.Setup(m => m.ToRecipients)
+                .Returns(new List<IRecipient> { recipient.Object });
+            CancellationToken token = new CancellationTokenSource().Token;
+
+            // Act
+            await client.IntializeForAppMail();
+            var apiResponse = await client.SendEmail(message.Object, false, token);
+
+            // Assert
+            Assert.IsType<ApiResponse>(apiResponse);
         }
 
         [Fact]
@@ -411,25 +437,10 @@ namespace iTEAMConsulting.O365.Tests
             // -------------------- Assert --------------------
             Assert.IsType<ApiResponse>(apiResponse);
             Assert.Equal(200, apiResponse.StatusCode);
+            Assert.Equal(true, apiResponse.Success);
         }
 
         /* ------------------------------ HELPER FUNCTIONS ------------------------------ */
-        private IOptions<O365AuthenticationOptions> MockOptions()
-        {
-            var options = new Mock<IOptions<O365AuthenticationOptions>>();
-            options.Setup(i => i.Value)
-                .Returns(
-                    new O365AuthenticationOptions()
-                    {
-                        ClientId = "LKAMFLDSNFLASDFLANDF",
-                        ClientSecret = "AKLSJFLASNDFLASNDF",
-                        TenantId = "ATAETAERADFADFGER",
-                        TenantName = "FASLALKDFNLANDF"
-                    }
-                );
-            return options.Object;
-        }
-
         private ILoggerFactory MockLoggerFactory(ILogger<O365Client> logger = null)
         {
             var loggerFactory = new Mock<ILoggerFactory>();
@@ -447,7 +458,18 @@ namespace iTEAMConsulting.O365.Tests
         {
             if (options == null)
             {
-                options = MockOptions();
+                var optionsMock = new Mock<IOptions<O365AuthenticationOptions>>();
+                optionsMock.Setup(i => i.Value)
+                    .Returns(
+                        new O365AuthenticationOptions
+                        {
+                            ClientId = "LKAMFLDSNFLASDFLANDF",
+                            ClientSecret = "AKLSJFLASNDFLASNDF",
+                            TenantId = "ATAETAERADFADFGER",
+                            TenantName = "FASLALKDFNLANDF"
+                        }
+                    );
+                options = optionsMock.Object;
             }
 
             if (adal == null)
