@@ -18,7 +18,7 @@ namespace iTEAMConsulting.O365
         private readonly ILogger _logger;
         private readonly IAdalFactory _adalFactory;
         private readonly O365AuthenticationOptions _options;
-        private readonly HttpClient _backchannel;
+        private readonly IHttpClientAdapter _backchannel;
         private string _accessToken;
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace iTEAMConsulting.O365
         /// <summary>
         /// Backchannel used to access the Office365 endpoints.
         /// </summary>
-        public HttpClient Backchannel => _backchannel;
+        public IHttpClientAdapter Backchannel => _backchannel;
 
         /// <summary>
         /// Convenience method to login for the office 365 mail resource.

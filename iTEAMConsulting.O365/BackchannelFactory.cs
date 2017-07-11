@@ -5,9 +5,9 @@ namespace iTEAMConsulting.O365
 {
     public class BackchannelFactory : IBackchannelFactory
     {
-        public HttpClient CreateBackchannel(string baseAddress)
+        public IHttpClientAdapter CreateBackchannel(string baseAddress)
         {
-            var client = new HttpClient();
+            var client = new HttpClientAdapter(new HttpClient());
             client.Timeout = TimeSpan.FromSeconds(30);
             client.BaseAddress = new Uri(baseAddress);
 

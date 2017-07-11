@@ -93,21 +93,6 @@ namespace iTEAMConsulting.O365.Tests
         }
 
         [Fact]
-        public async void LoginShould_ReturnLoginResponse()
-        {
-            // Arrange
-            var client = CreateClient(backchannel: new BackchannelFactory());
-
-            // Act
-            var response = await client.Login("resource", "clientId", "clientSecret");
-            
-            // Assert
-            Assert.NotNull(response);
-            Assert.IsType<LoginResponse>(response);
-            Assert.Equal("Access Token", response.AccessToken);
-        }
-
-        [Fact]
         public async void LoginShould_LogOnError()
         {
             // -------------------- Arrange --------------------
@@ -152,6 +137,21 @@ namespace iTEAMConsulting.O365.Tests
                 "Log not called once.");
             Assert.IsType<LoginResponse>(response);
             Assert.Empty(response.AccessToken);
+        }
+
+        [Fact]
+        public async void LoginShould_ReturnLoginResponse()
+        {
+            // Arrange
+            var client = CreateClient(backchannel: new BackchannelFactory());
+
+            // Act
+            var response = await client.Login("resource", "clientId", "clientSecret");
+            
+            // Assert
+            Assert.NotNull(response);
+            Assert.IsType<LoginResponse>(response);
+            Assert.Equal("Access Token", response.AccessToken);
         }
 
         [Fact]
@@ -334,11 +334,12 @@ namespace iTEAMConsulting.O365.Tests
                 It.IsAny<Func<object, Exception, string>>()));
 
             // Backchannel
-            HttpClient http = new HttpClient();
-            http.Timeout = TimeSpan.FromMilliseconds(10);
+            var http = new Mock<IHttpClientAdapter>();
+            http.Setup(h => h.SendAsync(It.IsAny<HttpRequestMessage>()))
+                .ThrowsAsync(new Exception());
             var backchannelFactory = new Mock<IBackchannelFactory>();
             backchannelFactory.Setup(b => b.CreateBackchannel(It.IsAny<string>()))
-                .Returns(http);
+                .Returns(http.Object);
 
             // Create the client
             var client = CreateClient(
@@ -377,6 +378,39 @@ namespace iTEAMConsulting.O365.Tests
                 Times.Once(),
                 "Log not called once.");
             Assert.IsType<ApiResponse>(apiResponse);
+        }
+
+        [Fact]
+        public async void SendEmailsShould_ReturnApiResponse()
+        {
+            // -------------------- Arrange --------------------
+            // Create the client
+            var client = CreateClient();
+
+            // Message (Subject, Body, and Recipients) and Cancellation Token
+            var recipient = new Mock<IRecipient>();
+            recipient.Setup(r => r.EmailAddress)
+                .Returns("abc@abc.com");
+            var message = new Mock<IMessage>();
+            message.Setup(m => m.Body)
+                .Returns("Body");
+            message.Setup(m => m.Subject)
+                .Returns("Subject");
+            message.Setup(m => m.ToRecipients)
+                .Returns(new List<IRecipient> { recipient.Object });
+            CancellationToken token = new CancellationTokenSource().Token;
+
+            // -------------------- Act --------------------
+            var loginResponse = await client.Login("resource", "clientId", "clientSecret");
+            var apiResponse = await client.SendEmail(
+                message.Object,
+                false,
+                token
+            );
+
+            // -------------------- Assert --------------------
+            Assert.IsType<ApiResponse>(apiResponse);
+            Assert.Equal(200, apiResponse.StatusCode);
         }
 
         /* ------------------------------ HELPER FUNCTIONS ------------------------------ */
@@ -436,7 +470,13 @@ namespace iTEAMConsulting.O365.Tests
 
             if (backchannel == null)
             {
-                backchannel = new BackchannelFactory();
+                var http = new Mock<IHttpClientAdapter>();
+                http.Setup(h => h.SendAsync(It.IsAny<HttpRequestMessage>()))
+                    .ReturnsAsync(new HttpResponseMessage(System.Net.HttpStatusCode.OK));
+                var backchannelFactory = new Mock<IBackchannelFactory>();
+                backchannelFactory.Setup(b => b.CreateBackchannel(It.IsAny<string>()))
+                    .Returns(http.Object);
+                backchannel = backchannelFactory.Object;
             }
 
             if (logger == null)
