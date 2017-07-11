@@ -324,6 +324,29 @@ namespace iTEAMConsulting.O365.Tests
         public async void SendEmailsShouldLog_OnUnsuccessfulSendAsync()
         {
             // -------------------- Arrange --------------------
+            // Logger
+            var logger = new Mock<ILogger<O365Client>>();
+            logger.Setup(i => i.Log(
+                Microsoft.Extensions.Logging.LogLevel.Error,
+                0,
+                It.IsAny<Microsoft.Extensions.Logging.Internal.FormattedLogValues>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<object, Exception, string>>()));
+
+            // Backchannel
+            HttpClient http = new HttpClient();
+            http.Timeout = TimeSpan.FromMilliseconds(10);
+            var backchannelFactory = new Mock<IBackchannelFactory>();
+            backchannelFactory.Setup(b => b.CreateBackchannel(It.IsAny<string>()))
+                .Returns(http);
+
+            // Create the client
+            var client = CreateClient(
+                logger: MockLoggerFactory(logger.Object),
+                backchannel: backchannelFactory.Object
+            );
+
+            // Message (Subject, Body, and Recipients) and Cancellation Token
             var recipient = new Mock<IRecipient>();
             recipient.Setup(r => r.EmailAddress)
                 .Returns("abc@abc.com");
@@ -335,14 +358,6 @@ namespace iTEAMConsulting.O365.Tests
             message.Setup(m => m.ToRecipients)
                 .Returns(new List<IRecipient> { recipient.Object });
             CancellationToken token = new CancellationTokenSource().Token;
-            var logger = new Mock<ILogger<O365Client>>();
-            logger.Setup(i => i.Log(
-                Microsoft.Extensions.Logging.LogLevel.Error,
-                0,
-                It.IsAny<Microsoft.Extensions.Logging.Internal.FormattedLogValues>(),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<object, Exception, string>>()));
-            var client = CreateClient(logger: MockLoggerFactory(logger.Object));
 
             // -------------------- Act --------------------
             var loginResponse = await client.Login("resource", "clientId", "clientSecret");
@@ -421,14 +436,7 @@ namespace iTEAMConsulting.O365.Tests
 
             if (backchannel == null)
             {
-                // THIS IS SETUP TO BREAK
-                // NEED TO CHANGE TO NOT BREAK
-                HttpClient http = new HttpClient();
-                http.Timeout = TimeSpan.FromMilliseconds(10);
-                var backchannelFactory = new Mock<IBackchannelFactory>();
-                backchannelFactory.Setup(b => b.CreateBackchannel(It.IsAny<string>()))
-                    .Returns(http);
-                backchannel = backchannelFactory.Object;
+                backchannel = new BackchannelFactory();
             }
 
             if (logger == null)
