@@ -110,7 +110,19 @@ namespace iTEAMConsulting.O365.Tests
         [Fact]
         public async void LoginShould_LogOnError()
         {
-            // Arrange
+            // -------------------- Arrange --------------------
+            // ADAL Factory
+            var authenticationContext = new Mock<IAuthenticationContextAdapter>();
+            authenticationContext.Setup(context => context.AcquireTokenAsync(
+                It.IsAny<string>(),
+                It.IsAny<ClientCredential>()
+            ))
+                .ThrowsAsync(new Exception());
+            var adalFactory = new Mock<IAdalFactory>();
+            adalFactory.Setup(factory => factory.CreateAuthenticationContext(It.IsAny<string>()))
+                .Returns(authenticationContext.Object);
+
+            // Logger
             var logger = new Mock<ILogger<O365Client>>();
             logger.Setup(i => i.Log(
                 Microsoft.Extensions.Logging.LogLevel.Error,
@@ -119,14 +131,17 @@ namespace iTEAMConsulting.O365.Tests
                 It.IsAny<Exception>(),
                 It.IsAny<Func<object, Exception, string>>()))
                 .Verifiable();
+
+            // Create Client
             var client = CreateClient(
+                adal: adalFactory.Object,
                 backchannel: new BackchannelFactory(),
                 logger: MockLoggerFactory(logger.Object));
 
-            // Act
+            // -------------------- Act --------------------
             var response = await client.Login("resource", "clientId", "clientSecret");
 
-            // Assert
+            // -------------------- Assert --------------------
             logger.Verify(x => x.Log(
                 Microsoft.Extensions.Logging.LogLevel.Error,
                 0,
