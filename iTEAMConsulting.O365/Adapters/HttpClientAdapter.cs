@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace iTEAMConsulting.O365
 {
-    class HttpClientAdapter : IHttpClientAdapter
+    public class HttpClientAdapter : IHttpClientAdapter
     {
         private readonly HttpClient _client = new HttpClient();
 
