@@ -12,5 +12,6 @@ namespace iTEAMConsulting.O365
         public string TenantId { get; set; }
         public byte[] CertBytes { get; set; }
         public string CertPrivateKey { get; set; }
+        public string FromAddress { get; set; }
     }
 }

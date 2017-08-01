@@ -20,7 +20,7 @@ namespace iTEAMConsulting.O365
         private readonly IAdalFactory _adalFactory;
         private readonly O365AuthenticationOptions _options;
         private readonly IHttpClientAdapter _backchannel;
-        private readonly string _apiBaseUrl = "/api/v2.0/me";
+        private string _apiBaseUrl = "/api/v2.0/Users";
         private string _accessToken;
 
         /// <summary>
@@ -40,6 +40,7 @@ namespace iTEAMConsulting.O365
             _logger = loggerFactory.CreateLogger(nameof(O365Client));
             _adalFactory = adalFactory;
             _backchannel = backchannelFactory.CreateBackchannel("https://outlook.office.com");
+            _apiBaseUrl += $"({_options.FromAddress})";
         }
 
         /// <summary>
