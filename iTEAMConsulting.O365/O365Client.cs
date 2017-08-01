@@ -20,7 +20,7 @@ namespace iTEAMConsulting.O365
         private readonly IAdalFactory _adalFactory;
         private readonly O365AuthenticationOptions _options;
         private readonly IHttpClientAdapter _backchannel;
-        private readonly string _apiBaseUrl = "/api/v2/me";
+        private readonly string _apiBaseUrl = "/api/v2.0/me";
         private string _accessToken;
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace iTEAMConsulting.O365
             _options = optionsAccessor.Value ?? new O365AuthenticationOptions();
             _logger = loggerFactory.CreateLogger(nameof(O365Client));
             _adalFactory = adalFactory;
-            _backchannel = backchannelFactory.CreateBackchannel("https://outlook.office365.com");
+            _backchannel = backchannelFactory.CreateBackchannel("https://outlook.office.com");
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace iTEAMConsulting.O365
         /// <returns>A login task.</returns>
         public async Task IntializeForAppMail()
         {
-            await Login("https://outlook.office365.com", _options.CertBytes, _options.CertPrivateKey, _options.ClientId);
+            await Login("https://outlook.office.com", _options.CertBytes, _options.CertPrivateKey, _options.ClientId);
         }
 
         public async Task<ILoginResponse> Login(string resource, byte[] certBytes, string secret, string clientId)
