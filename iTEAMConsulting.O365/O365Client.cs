@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,7 +53,40 @@ namespace iTEAMConsulting.O365
         /// <returns>A login task.</returns>
         public async Task IntializeForAppMail()
         {
-            await Login("https://outlook.office.com", _options.ClientId, _options.ClientSecret);
+            await Login("https://outlook.office.com", _options.CertBytes, _options.CertPrivateKey, _options.ClientId);
+        }
+
+        public async Task<ILoginResponse> Login(string resource, byte[] certBytes, string secret, string clientId)
+        {
+            if (string.IsNullOrEmpty(resource))
+            {
+                throw new ArgumentNullException(nameof(resource));
+            }
+
+            if (!certBytes.Any())
+            {
+                throw new ArgumentNullException(nameof(certBytes));
+            }
+
+            if (string.IsNullOrEmpty(secret))
+            {
+                throw new ArgumentNullException(nameof(secret));
+            }
+
+            var context = _adalFactory.CreateAuthenticationContext("https://login.microsoftonline.com/" + _options.TenantName);
+            var cert = new X509Certificate2(certBytes, secret);
+            var assertion = new ClientAssertionCertificate(clientId, cert);
+
+            try
+            {
+                var response = await context.AcquireTokenAsync(resource, assertion);
+                _accessToken = response.AccessToken;
+                return new LoginResponse(_accessToken);
+            } catch (Exception e)
+            {
+                _logger.LogError(0, e, "Failed to Login to Active Directory");
+                return new LoginResponse(string.Empty);
+            }
         }
 
         /// <summary>

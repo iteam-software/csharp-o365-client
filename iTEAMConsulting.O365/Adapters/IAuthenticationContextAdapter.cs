@@ -10,5 +10,6 @@ namespace iTEAMConsulting.O365
     public interface IAuthenticationContextAdapter
     {
         Task<IAuthenticationResultAdapter> AcquireTokenAsync(string resource, ClientCredential credential);
+        Task<IAuthenticationResultAdapter> AcquireTokenAsync(string resource, ClientAssertionCertificate cac);
     }
 }
