@@ -18,7 +18,7 @@ namespace iTEAMConsulting.O365
         private readonly ILogger _logger;
         private readonly IAdalFactory _adalFactory;
         private readonly O365AuthenticationOptions _options;
-        private readonly HttpClient _backchannel;
+        private readonly IHttpClientAdapter _backchannel;
         private readonly string _apiBaseUrl = "/api/v2/me";
         private string _accessToken;
 
