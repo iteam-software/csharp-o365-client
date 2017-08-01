@@ -39,7 +39,7 @@ namespace iTEAMConsulting.O365
             _options = optionsAccessor.Value ?? new O365AuthenticationOptions();
             _logger = loggerFactory.CreateLogger(nameof(O365Client));
             _adalFactory = adalFactory;
-            _backchannel = backchannelFactory.CreateBackchannel("https://outlook.office.com");
+            _backchannel = backchannelFactory.CreateBackchannel("https://outlook.office365.com");
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace iTEAMConsulting.O365
         /// <returns>A login task.</returns>
         public async Task IntializeForAppMail()
         {
-            await Login("https://outlook.office.com", _options.CertBytes, _options.CertPrivateKey, _options.ClientId);
+            await Login("https://outlook.office365.com", _options.CertBytes, _options.CertPrivateKey, _options.ClientId);
         }
 
         public async Task<ILoginResponse> Login(string resource, byte[] certBytes, string secret, string clientId)
@@ -188,6 +188,9 @@ namespace iTEAMConsulting.O365
             // Create the message
             var request = new HttpRequestMessage(HttpMethod.Post, _apiBaseUrl + "/sendmail");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("iTEAMConsulting.0365", "1.0.0"));
+            request.Headers.Add("client-request-id", new Guid().ToString());
+            request.Headers.Date = new DateTimeOffset(DateTime.Now);
             request.Content = payload;
 
             // Send!

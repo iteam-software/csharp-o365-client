@@ -10,7 +10,7 @@
     <PackageIconUrl>https://s.gravatar.com/avatar/468367f85c4e89a0bbd1ac1d0f43adb1?s=80</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/iteam-consulting/csharp-form-handler.git</RepositoryUrl>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
