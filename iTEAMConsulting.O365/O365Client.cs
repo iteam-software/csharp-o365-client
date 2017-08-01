@@ -44,7 +44,7 @@ namespace iTEAMConsulting.O365
         /// <summary>
         /// Backchannel used to access the Office365 endpoints.
         /// </summary>
-        public HttpClient Backchannel => _backchannel;
+        public IHttpClientAdapter Backchannel => _backchannel;
 
         /// <summary>
         /// Convenience method to login for the office 365 mail resource.
@@ -126,7 +126,10 @@ namespace iTEAMConsulting.O365
                 throw new ArgumentNullException(nameof(message.Subject));
             }
 
-            if (!message.ToRecipients.Any(r => string.IsNullOrEmpty(r.EmailAddress)))
+            if (
+                message.ToRecipients.Count() == 0 ||
+                message.ToRecipients.Any(r => string.IsNullOrEmpty(r.EmailAddress))
+            )
             {
                 throw new ArgumentException("You must provide valid recipient email addresses", nameof(message.ToRecipients));
             }

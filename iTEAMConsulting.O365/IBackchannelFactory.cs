@@ -7,6 +7,6 @@ namespace iTEAMConsulting.O365
 {
     public interface IBackchannelFactory
     {
-        HttpClient CreateBackchannel(string baseAddress);
+        IHttpClientAdapter CreateBackchannel(string baseAddress);
     }
 }
