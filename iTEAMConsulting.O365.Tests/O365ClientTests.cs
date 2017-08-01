@@ -9,6 +9,8 @@ using iTEAMConsulting.O365.Abstractions;
 using System.Threading;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
 
 namespace iTEAMConsulting.O365.Tests
 {
@@ -159,7 +161,9 @@ namespace iTEAMConsulting.O365.Tests
         public async void InitializeForAppMailShould_Login()
         {
             // Arrange
-            var client = CreateClient();
+            var loggerFactory = new Mock<ILoggerFactory>();
+            loggerFactory.Setup(lf => lf.CreateLogger(It.IsAny<string>())).Returns(new Mock<ILogger>().Object);
+            var client = CreateClient(logger: loggerFactory.Object);
             var recipient = new Mock<IRecipient>();
             recipient.Setup(r => r.EmailAddress)
                 .Returns("abc@abc.com");
@@ -466,7 +470,9 @@ namespace iTEAMConsulting.O365.Tests
                             ClientId = "LKAMFLDSNFLASDFLANDF",
                             ClientSecret = "AKLSJFLASNDFLASNDF",
                             TenantId = "ATAETAERADFADFGER",
-                            TenantName = "FASLALKDFNLANDF"
+                            TenantName = "FASLALKDFNLANDF",
+                            CertBytes = File.ReadAllBytes(Directory.GetCurrentDirectory() + "/testCert.cer"),
+                            CertPrivateKey = "FALSTAD",
                         }
                     );
                 options = optionsMock.Object;
@@ -482,6 +488,12 @@ namespace iTEAMConsulting.O365.Tests
                     .Setup(context => context.AcquireTokenAsync(
                         It.IsAny<string>(),
                         It.IsAny<ClientCredential>()
+                    ))
+                    .Returns(Task.FromResult(authenticationResult.Object));
+                authenticationContext
+                    .Setup(context => context.AcquireTokenAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<ClientAssertionCertificate>()
                     ))
                     .Returns(Task.FromResult(authenticationResult.Object));
                 var adalFactory = new Mock<IAdalFactory>();

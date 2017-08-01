@@ -14,4 +14,10 @@
     <ProjectReference Include="..\iTEAMConsulting.O365\iTEAMConsulting.O365.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="testCert.cer">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
