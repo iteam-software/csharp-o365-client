@@ -75,7 +75,7 @@ namespace iTEAMConsulting.O365
             }
 
             var context = _adalFactory.CreateAuthenticationContext("https://login.microsoftonline.com/" + _options.TenantName);
-            var cert = new X509Certificate2(certBytes, secret, X509KeyStorageFlags.UserKeySet);
+            var cert = new X509Certificate2(certBytes, secret, X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.PersistKeySet);
             var assertion = new ClientAssertionCertificate(clientId, cert);
 
             try
