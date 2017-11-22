@@ -54,7 +54,57 @@ namespace iTEAMConsulting.O365
         /// <returns>A login task.</returns>
         public async Task IntializeForAppMail()
         {
-            await Login("https://outlook.office.com", _options.CertBytes, _options.CertPrivateKey, _options.ClientId);
+            if (!string.IsNullOrEmpty(_options.CertThumbprint))
+            {
+                await LoginWithThumbprint("https://outlook.office.com", _options.ClientId, _options.CertThumbprint);
+            }
+            else
+            {
+                await Login("https://outlook.office.com", _options.CertBytes, _options.CertPrivateKey, _options.ClientId);
+            }
+        }
+
+        private async Task<LoginResponse> LoginWithThumbprint(string resource, string clientId, string thumbprint)
+        {
+            if (string.IsNullOrEmpty(resource))
+            {
+                throw new ArgumentNullException(nameof(resource));
+            }
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                throw new ArgumentNullException(nameof(clientId));
+            }
+
+            if (string.IsNullOrEmpty(thumbprint))
+            {
+                throw new ArgumentNullException(nameof(clientId));
+            }
+
+            var context = _adalFactory.CreateAuthenticationContext("https://login.microsoftonline.com/" + _options.TenantName);
+            var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly);
+
+            var certs = store.Certificates.Find(X509FindType.FindByThumbprint, _options.CertThumbprint, false);
+            if (certs.Count == 0)
+            {
+                throw new Exception("Unable to find certificate for the given thumbprint");
+            }
+
+            var cert = certs[0];
+            var assertion = new ClientAssertionCertificate(clientId, cert);
+
+            try
+            {
+                var response = await context.AcquireTokenAsync(resource, assertion);
+                _accessToken = response.AccessToken;
+                return new LoginResponse(_accessToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(0, e, "Failed to Login to Active Directory");
+                return new LoginResponse(string.Empty);
+            }
         }
 
         public async Task<ILoginResponse> Login(string resource, byte[] certBytes, string secret, string clientId)
