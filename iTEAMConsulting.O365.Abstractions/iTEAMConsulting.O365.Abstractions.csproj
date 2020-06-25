@@ -10,6 +10,14 @@
     <PackageIconUrl>https://s.gravatar.com/avatar/468367f85c4e89a0bbd1ac1d0f43adb1?s=80</PackageIconUrl>
     <RepositoryUrl>https://github.com/iteam-consulting/csharp-o365-client.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
 </Project>
